@@ -12,10 +12,11 @@ import (
 	"log"
 	"net"
 	"runtime/debug"
+	"time"
 
-	"github.com/stacktitan/smb/gss"
-	"github.com/stacktitan/smb/ntlmssp"
-	"github.com/stacktitan/smb/smb/encoder"
+	"github.com/projectdiscovery/smb/gss"
+	"github.com/projectdiscovery/smb/ntlmssp"
+	"github.com/projectdiscovery/smb/smb/encoder"
 )
 
 type Session struct {
@@ -39,6 +40,7 @@ type Options struct {
 	User        string
 	Password    string
 	Hash        string
+	Timeout     time.Duration
 }
 
 func validateOptions(opt Options) error {
@@ -57,7 +59,7 @@ func NewSession(opt Options, debug bool) (s *Session, err error) {
 		return nil, err
 	}
 
-	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", opt.Host, opt.Port))
+	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", opt.Host, opt.Port), opt.Timeout)
 	if err != nil {
 		return
 	}
